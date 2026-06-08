@@ -14,23 +14,13 @@
 	--sl-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 }
 
-/* ─── Dark theme (Starlight default) — cool graphite + water accent ── */
-:root {
-	--sl-color-accent-low: #1d3d48;
-	--sl-color-accent: #4a90a8;        /* water-dark, lifted for dark bg */
-	--sl-color-accent-high: #b7dbe8;   /* pale water — link/hover text */
-
-	--sl-color-white: #ffffff;
-	--sl-color-gray-1: #e9ecf0;
-	--sl-color-gray-2: #c0c6cf;
-	--sl-color-gray-3: #98a0ac;        /* ink-muted */
-	--sl-color-gray-4: #65707d;        /* ink-tertiary */
-	--sl-color-gray-5: #3d4452;        /* ink-secondary */
-	--sl-color-gray-6: #21252e;
-	--sl-color-black: #15181f;         /* ink-primary as the deep surface */
-}
-
-/* ─── Light theme — paper white + graphite ink + water-dark accent ── */
+/* Light-only: the docs match the light-first app. The theme is forced
+ * to light (src/components/ThemeProvider.astro) and the toggle is
+ * removed (src/components/ThemeSelect.astro), so there is no dark
+ * palette — these values under [data-theme='light'] always win over
+ * Starlight's defaults (same specificity, loaded later).
+ *
+ * Paper white + graphite ink + water-dark accent. */
 :root[data-theme='light'] {
 	--sl-color-accent-low: #d6e7ee;
 	--sl-color-accent: #2c5868;        /* brand water-dark — links/active */

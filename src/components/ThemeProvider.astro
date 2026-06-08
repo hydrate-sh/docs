@@ -1,0 +1,11 @@
+---
+// Override of Starlight's ThemeProvider. The docs are light-only (they
+// match the light-first app), so instead of reading localStorage /
+// `prefers-color-scheme`, we pin `data-theme="light"`. Inline + in
+// <head> so it lands before first paint — no flash of the default
+// dark theme.
+---
+
+<script is:inline>
+	document.documentElement.dataset.theme = 'light'
+</script>

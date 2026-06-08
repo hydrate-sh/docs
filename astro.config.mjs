@@ -16,6 +16,12 @@ export default defineConfig({
 			},
 			favicon: '/favicon.png',
 			customCss: ['./src/styles/brand.css'],
+			// Light-only: pin the theme and drop the toggle (matches the
+			// light-first app).
+			components: {
+				ThemeProvider: './src/components/ThemeProvider.astro',
+				ThemeSelect: './src/components/ThemeSelect.astro',
+			},
 			social: [
 				{
 					icon: 'github',
