@@ -1,0 +1,28 @@
+---
+title: hydrate.sh documentation
+description: Guides, concepts, and the v1 API reference for hydrate.sh.
+template: splash
+hero:
+  tagline: Structured systems thinking for software engineers.
+  actions:
+    - text: Get started
+      link: /getting-started/introduction/
+      icon: right-arrow
+    - text: API reference
+      link: /api/v1/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+	<Card title="Get started" icon="document">
+		Start with the [introduction](/getting-started/introduction/), then
+		[authenticate](/getting-started/authentication/) to the v1 API.
+	</Card>
+	<Card title="API reference" icon="open-book">
+		The [v1 API](/api/v1/) is the canonical surface for graph operations.
+		It's generated from the live OpenAPI spec.
+	</Card>
+</CardGrid>
