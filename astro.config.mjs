@@ -10,6 +10,12 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'hydrate.sh',
+			logo: {
+				src: './src/assets/logo.png',
+				alt: 'hydrate.sh droplet mark',
+			},
+			favicon: '/favicon.png',
+			customCss: ['./src/styles/brand.css'],
 			social: [
 				{
 					icon: 'github',

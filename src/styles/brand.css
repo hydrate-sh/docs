@@ -1,0 +1,57 @@
+/* hydrate.sh brand theming for Starlight.
+ *
+ * Palette + fonts mirror the app (frontend/src/index.css): a cool
+ * blue-gray ink/surface family, water-blue + sage-green brand accents,
+ * Inter for body/headings, JetBrains Mono for code, Fraunces reserved
+ * for the wordmark only. Starlight inverts its gray ramp per theme
+ * (`--sl-color-white` = text, `--sl-color-black` = background), so the
+ * light and dark blocks below assign the same hues from opposite ends.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+	--sl-font: 'Inter', system-ui, -apple-system, sans-serif;
+	--sl-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+
+/* ─── Dark theme (Starlight default) — cool graphite + water accent ── */
+:root {
+	--sl-color-accent-low: #1d3d48;
+	--sl-color-accent: #4a90a8;        /* water-dark, lifted for dark bg */
+	--sl-color-accent-high: #b7dbe8;   /* pale water — link/hover text */
+
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #e9ecf0;
+	--sl-color-gray-2: #c0c6cf;
+	--sl-color-gray-3: #98a0ac;        /* ink-muted */
+	--sl-color-gray-4: #65707d;        /* ink-tertiary */
+	--sl-color-gray-5: #3d4452;        /* ink-secondary */
+	--sl-color-gray-6: #21252e;
+	--sl-color-black: #15181f;         /* ink-primary as the deep surface */
+}
+
+/* ─── Light theme — paper white + graphite ink + water-dark accent ── */
+:root[data-theme='light'] {
+	--sl-color-accent-low: #d6e7ee;
+	--sl-color-accent: #2c5868;        /* brand water-dark — links/active */
+	--sl-color-accent-high: #1d3d48;
+
+	--sl-color-white: #15181f;         /* ink-primary — headings/text */
+	--sl-color-gray-1: #2a2e37;
+	--sl-color-gray-2: #3d4452;        /* ink-secondary */
+	--sl-color-gray-3: #65707d;        /* ink-tertiary */
+	--sl-color-gray-4: #98a0ac;        /* ink-muted */
+	--sl-color-gray-5: #d8dce2;        /* border-default */
+	--sl-color-gray-6: #eceff2;        /* surface-reading */
+	--sl-color-gray-7: #f9fbfc;        /* surface-card */
+	--sl-color-black: #ffffff;         /* paper — page background */
+}
+
+/* The site title is the wordmark: Fraunces, lowercase, tight tracking
+ * (identity.md). The droplet mark to its left completes the lockup. */
+.site-title {
+	font-family: 'Fraunces', 'Charter', Georgia, serif;
+	font-weight: 400;
+	letter-spacing: -0.015em;
+	text-transform: lowercase;
+}
