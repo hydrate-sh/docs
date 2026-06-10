@@ -45,3 +45,12 @@
 	letter-spacing: -0.015em;
 	text-transform: lowercase;
 }
+
+/* Card icon chips use the brand water accent instead of Starlight's
+ * per-card rotating tints (purple/orange/blue/…), which clash with the
+ * cool palette. `!important` overrides the `:nth-child` cycle.
+ * Semantic asides (note/tip/caution/danger) keep their own colors. */
+.card {
+	--sl-card-border: var(--sl-color-accent) !important;
+	--sl-card-bg: var(--sl-color-accent-low) !important;
+}
