@@ -1,16 +1,16 @@
 ---
 title: hydrate.sh documentation
-description: Guides, concepts, and the v1 API reference for hydrate.sh.
+description: Documentation for the hydrate.sh v1 API and the hydrate CLI.
 template: splash
 hero:
-  tagline: Structured systems thinking for software engineers.
+  tagline: Documentation for the v1 API and the hydrate CLI.
   actions:
     - text: Get started
       link: /getting-started/introduction/
       icon: right-arrow
-    - text: API reference
-      link: /api/v1/
-      icon: open-book
+    - text: CLI quickstart
+      link: /cli/quickstart/
+      icon: laptop
       variant: minimal
 ---
 
@@ -18,11 +18,20 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
 	<Card title="Get started" icon="document">
-		Start with the [introduction](/getting-started/introduction/), then
-		[authenticate](/getting-started/authentication/) to the v1 API.
+		Start with the [introduction](/getting-started/introduction/), learn
+		[the graph model](/concepts/graph-model/), then
+		[authenticate](/getting-started/authentication/).
+	</Card>
+	<Card title="Author from the terminal" icon="laptop">
+		The [`hydrate` CLI](/cli/quickstart/) builds and edits your graph from the
+		command line: fork a branch, stage edits, commit.
+	</Card>
+	<Card title="The graph model" icon="puzzle">
+		Nodes, [typed ports, edges, and branches](/concepts/graph-model/): the
+		vocabulary both the CLI and the API assume.
 	</Card>
 	<Card title="API reference" icon="open-book">
-		The [v1 API](/api/v1/) is the canonical surface for graph operations.
-		It's generated from the live OpenAPI spec.
+		The [v1 API](/api/v1/) is the programmatic surface for graph operations,
+		generated from the live OpenAPI spec.
 	</Card>
 </CardGrid>

@@ -1,22 +1,32 @@
 ---
 title: Introduction
-description: What hydrate.sh is and how the v1 API fits in.
+description: The hydrate.sh v1 API and the hydrate CLI.
 ---
 
-hydrate.sh is a structured systems-thinking tool for software engineers. Your
-project lives as a graph, the source of truth. The code is an artifact of it.
+hydrate.sh stores a project as a graph. This documentation covers the two
+interfaces to that graph: the v1 HTTP API and the `hydrate` command-line client.
 
-## The v1 API
+## The graph
 
-The v1 API is the programmatic interface to your graph. Use it to read the
-graph, validate proposed changes, and apply them from scripts, CI, or your own
-tools.
+A project is a graph of nodes connected through typed ports. Each node has a
+description and a set of ports, and edges connect ports of matching type. See
+[The graph model](/concepts/graph-model/) for the full structure.
 
-The API is versioned in the path. `v1` is wire-stable: breaking changes will
-rebase to `/v2/` rather than mutate `v1` in place.
+## Interfaces
+
+- **The `hydrate` CLI** operates on the graph from the terminal. You fork a
+  working branch, stage edits, review them, and commit. See the
+  [CLI quickstart](/cli/quickstart/).
+- **The v1 API** is the HTTP interface for reading and modifying the graph. See
+  the [API reference](/api/v1/).
+
+Both interfaces operate on the same graph through the same delta API. The API is
+versioned in the path; `v1` is wire-stable, and a breaking change will rebase to
+`/v2/` rather than change `v1` in place.
 
 ## Next steps
 
-- [Authentication](/getting-started/authentication/) — get a key and make your
-  first request.
-- [API reference](/api/v1/) — every endpoint, generated from the OpenAPI spec.
+- [The graph model](/concepts/graph-model/): nodes, ports, edges, and branches.
+- [Authentication](/getting-started/authentication/): get a key and make a
+  request.
+- [CLI quickstart](/cli/quickstart/): author a graph from the terminal.
