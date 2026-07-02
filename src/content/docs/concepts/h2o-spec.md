@@ -17,9 +17,9 @@ pages describe precisely, field by field.
 
 - **Identifiers are UUIDs.** Every node, port, edge, and verification has a
   `id` that is a UUID string.
-- **The wire is camelCase.** Fields cross the HTTP boundary in camelCase
-  (`sourceHandle`, `targetHandle`, `isTestNode`). One field, `parent_id`, is
-  snake_case by historical accident.
+- **The wire is snake_case.** Every field crosses the HTTP boundary in
+  snake_case, and the `.h2o` file uses the same names. There are no camelCase
+  fields and no aliases — the field name you see here is the wire name.
 - **Types are nominal strings.** A port type such as `HotDog` or `Rating` is
   just a name. Two types are compatible when their strings are exactly equal.
 - **Unknown keys are ignored, not rejected.** A payload may carry extra keys;
@@ -40,7 +40,7 @@ A project is a graph of **nodes** and **edges**:
 ```
 
 When the graph is exported as a `.h2o` file (what the CLI works with), it is
-wrapped in an envelope carrying a `schemaVersion`, the project name, and the
+wrapped in an envelope carrying a `schema_version`, the project name, and the
 node and edge lists. See [Versioning](#versioning) below.
 
 ## Node
@@ -87,7 +87,7 @@ server-side.
 | `constraints` | string[] | `[]` | Free-text rules the node must obey. |
 | `verifications` | Verification[] | `[]` | Test specifications (behavior nodes only). |
 | `parent_id` | UUID \| null | `null` | The enclosing boundary; mutable via update. |
-| `is_test_node` | bool | `false` | Wire alias `isTestNode`. Strict boolean. |
+| `is_test_node` | bool | `false` | Strict boolean. |
 | `status` | string | `"idle"` | |
 | `user_kind` | string \| null | `null` | Boundary label / state's `state_kind`. |
 | `path_prefix` | string \| null | `null` | Boundary only. |
@@ -133,8 +133,8 @@ An edge connects one node's output port to another node's input port.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | UUID | Required. |
-| `sourceHandle` | UUID \| null | The source **output** port id. |
-| `targetHandle` | UUID \| null | The target **input** port id. |
+| `source_handle` | UUID \| null | The source **output** port id. |
+| `target_handle` | UUID \| null | The target **input** port id. |
 
 An edge runs **output → input**, and the two ports must have the **same type**.
 Config ports are never edge endpoints. See the [edge rules](#edge-rules) for how
@@ -156,12 +156,12 @@ seven.
 | `type` | Fields | Effect |
 |---|---|---|
 | `add_node` | `node` | Insert a node. |
-| `delete_node` | `nodeId` | Delete a node and cascade to its descendant subtree. |
-| `update_node_data` | `nodeId`, `after` | Update a node's data (key-presence partial semantics). |
-| `reparent_node` | `nodeId`, `parent_id` | Move a node to a new parent, or to top-level (`null`). |
+| `delete_node` | `node_id` | Delete a node and cascade to its descendant subtree. |
+| `update_node_data` | `node_id`, `after` | Update a node's data (key-presence partial semantics). |
+| `reparent_node` | `node_id`, `parent_id` | Move a node to a new parent, or to top-level (`null`). |
 | `add_edge` | `edge` | Insert an edge. |
-| `delete_edge` | `edgeId` | Remove an edge. |
-| `flatten_boundary` | `nodeId` | Delete a boundary and promote its children to its parent. |
+| `delete_edge` | `edge_id` | Remove an edge. |
+| `flatten_boundary` | `node_id` | Delete a boundary and promote its children to its parent. |
 
 Notes on the partial-mutation deltas:
 
@@ -235,9 +235,10 @@ Each kind admits a specific set of fields:
 
 Two version numbers matter, and they are independent:
 
-- **`schemaVersion`** — the `.h2o` **file format** version. It advances when the
-  format gains structure: boundary nodes arrived at `3`, state at `4`, and io at
-  `5` (the current version). A reader upgrades older files forward.
+- **`schema_version`** — the `.h2o` **file format** version. It advances when the
+  format gains structure: boundary nodes arrived at `3`, state at `4`, io at `5`,
+  and the snake_case recase at `6` (the current version). A reader upgrades older
+  files forward.
 - **The v1 API** is versioned in its path (`/v1`). The shapes on this page are
   what that version accepts; a breaking change to the wire shape would land under
   a new path, never by mutating `/v1` under you.
