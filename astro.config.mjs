@@ -55,6 +55,7 @@ export default defineConfig({
 					label: 'Concepts',
 					items: [
 						{ label: 'The graph model', slug: 'concepts/graph-model' },
+						{ label: 'The h2o spec', slug: 'concepts/h2o-spec' },
 					],
 				},
 				{
