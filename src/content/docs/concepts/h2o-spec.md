@@ -17,9 +17,12 @@ pages describe precisely, field by field.
 
 - **Identifiers are UUIDs.** Every node, port, edge, and verification has a
   `id` that is a UUID string.
-- **The wire is camelCase.** Fields cross the HTTP boundary in camelCase
-  (`sourceHandle`, `targetHandle`, `isTestNode`). One field, `parent_id`, is
-  snake_case by historical accident.
+- **Field naming is mixed.** Most fields are snake_case (`user_kind`,
+  `path_prefix`, `is_external`, `source_decisions`, `parent_id`). A small set of
+  fields cross the wire in camelCase: the delta reference fields `nodeId` and
+  `edgeId`, the edge endpoints `sourceHandle` and `targetHandle`, and
+  `isTestNode`. Notably, `parent_id` stays snake_case even inside a delta whose
+  own reference field (`nodeId`) is camelCase.
 - **Types are nominal strings.** A port type such as `HotDog` or `Rating` is
   just a name. Two types are compatible when their strings are exactly equal.
 - **Unknown keys are ignored, not rejected.** A payload may carry extra keys;
