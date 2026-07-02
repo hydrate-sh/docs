@@ -3,10 +3,10 @@ title: hydrate.sh documentation
 description: Documentation for the hydrate.sh v1 API and the hydrate CLI.
 template: splash
 hero:
-  tagline: Documentation for the v1 API and the hydrate CLI.
+  tagline: Design software as a graph of typed decisions. The graph is the source of truth; code is an artifact.
   actions:
-    - text: Get started
-      link: /getting-started/introduction/
+    - text: Read the Quickstart
+      link: /getting-started/quickstart/
       icon: right-arrow
     - text: CLI quickstart
       link: /cli/quickstart/
@@ -16,19 +16,27 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+:::tip[New here? Start with the Quickstart.]
+The **[Quickstart](/getting-started/quickstart/)** is the one page that explains
+what hydrate.sh is, what you can do in the current alpha, the two API keys you
+need, and every concept — node types, descriptions, typed ports, and editing the
+graph. Read it first.
+:::
+
 <CardGrid>
-	<Card title="Get started" icon="document">
-		Start with the [introduction](/getting-started/introduction/), learn
-		[the graph model](/concepts/graph-model/), then
-		[authenticate](/getting-started/authentication/).
+	<Card title="Start here" icon="rocket">
+		The **[Quickstart](/getting-started/quickstart/)** is the fastest path in:
+		what you can do today, the API keys you need, and the core concepts, one by
+		one. Then [authenticate](/getting-started/authentication/) and build.
 	</Card>
 	<Card title="Author from the terminal" icon="laptop">
 		The [`hydrate` CLI](/cli/quickstart/) builds and edits your graph from the
 		command line: fork a branch, stage edits, commit.
 	</Card>
-	<Card title="The graph model" icon="puzzle">
-		Nodes, [typed ports, edges, and branches](/concepts/graph-model/): the
-		vocabulary both the CLI and the API assume.
+	<Card title="The concepts" icon="puzzle">
+		[The graph model](/concepts/graph-model/) explains nodes, typed ports,
+		edges, and branches; [the h2o spec](/concepts/h2o-spec/) is the canonical
+		format they all derive from.
 	</Card>
 	<Card title="API reference" icon="open-book">
 		The [v1 API](/api/v1/) is the programmatic surface for graph operations,

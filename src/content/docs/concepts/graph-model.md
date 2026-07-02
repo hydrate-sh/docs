@@ -4,7 +4,9 @@ description: Nodes, typed ports, edges, boundaries, and branches.
 ---
 
 A hydrate project is a graph. This page defines its structure, which both the
-[CLI](/cli/quickstart/) and the [v1 API](/api/v1/) operate on.
+[CLI](/cli/quickstart/) and the [v1 API](/api/v1/) operate on. For the formal,
+field-by-field reference — the canonical **h2o** format, its delta grammar, and
+the invariants the server enforces — see [The h2o spec](/concepts/h2o-spec/).
 
 ## Nodes
 
@@ -76,6 +78,7 @@ directly. The graph is stored on the server, and the CLI keeps a local view that
 
 ## See also
 
+- [The h2o spec](/concepts/h2o-spec/): the formal format reference.
 - [CLI quickstart](/cli/quickstart/): the commands that build a graph.
 - [CLI command reference](/cli/reference/): every verb and flag.
 - [API reference](/api/v1/): the same operations over HTTP.
