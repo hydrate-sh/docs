@@ -8,15 +8,25 @@ A hydrate project is a graph. This page defines its structure, which both the
 
 ## Nodes
 
-A node is a vertex in the graph. There are two kinds:
+A node is a vertex in the graph. There are four kinds:
 
-- **Behavior**: a node that represents a unit of work.
+- **Behavior**: a unit of work. The default kind.
 - **Boundary**: a node that contains other nodes. Boundaries nest, forming a
   tree of containment over the graph.
+- **State**: a place shared, mutable data lives. Its input ports are writes and
+  its output ports are reads.
+- **I/O**: the program's edge with its environment — where data enters or leaves
+  (standard input, arguments, the caller; standard output, an exit code, a
+  response). An I/O node carries exactly one typed port on one side: an output
+  port makes it a source (data flowing into the program), an input port a sink
+  (data flowing out).
 
-A node may be marked external, representing a system outside the graph. External
-nodes carry an external-kind label (for example, `rest-api`) and may name a
-protocol (for example, `gRPC`).
+A behavior or boundary may be marked external, representing a system outside the
+graph. External nodes carry an external-kind label (for example, `rest-api`) and
+may name a protocol (for example, `gRPC`).
+
+See [Node types](/getting-started/quickstart/#node-types) in the Quickstart for
+the shapes and when to reach for each.
 
 ### Node fields
 
