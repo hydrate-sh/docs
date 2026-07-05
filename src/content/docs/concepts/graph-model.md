@@ -38,7 +38,9 @@ Every node has a free-text **description**. It may also carry:
 - **Verifications**: a list of free-text strings.
 - **Doc URL**: an optional documentation link.
 
-Boundary nodes additionally have a user-kind label and a path prefix.
+Boundary nodes additionally have a user-kind label, a path prefix, and an
+optional **language** — the codegen language the boundary declares, which the
+nodes inside it inherit.
 
 ## Ports and types
 
