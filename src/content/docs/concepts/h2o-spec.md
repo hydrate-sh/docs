@@ -25,8 +25,9 @@ pages describe precisely, field by field.
 - **Unknown keys are ignored, not rejected.** A payload may carry extra keys;
   the server drops them silently. Missing *required* keys are rejected.
 - **Empty string means null.** For nullable string fields (`parent_id`,
-  `user_kind`, `path_prefix`, `external_kind`, `protocol`, `documentation_url`,
-  and edge handles), the server coerces `""` to `null` at parse time.
+  `user_kind`, `path_prefix`, `language`, `external_kind`, `protocol`,
+  `documentation_url`, and edge handles), the server coerces `""` to `null` at
+  parse time.
 
 ## The graph document
 
@@ -91,6 +92,7 @@ server-side.
 | `status` | string | `"idle"` | |
 | `user_kind` | string \| null | `null` | Boundary label / state's `state_kind`. |
 | `path_prefix` | string \| null | `null` | Boundary only. |
+| `language` | string \| null | `null` | Boundary only. The codegen language the boundary declares (open string, e.g. `go`); nodes inside inherit it. |
 | `is_external` | bool | `false` | Strict boolean. |
 | `external_kind` | string \| null | `null` | E.g. `rest-api`. External nodes only. |
 | `protocol` | string \| null | `null` | E.g. `gRPC`. External nodes only. |
@@ -188,13 +190,15 @@ Each kind admits a specific set of fields:
 |---|:---:|:---:|:---:|:---:|
 | `user_kind` | ✗ | ✓ | ✓ *(state_kind)* | ✗ |
 | `path_prefix` | ✗ | ✓ | ✗ | ✗ |
+| `language` | ✗ | ✓ | ✗ | ✗ |
 | `config` ports | ✓ | ✓ | ✗ | ✗ |
 | `verifications` | ✓ | — | ✗ | ✗ |
 | may be `external` | ✓ | ✓ | ✗ | ✗ |
 
-- **state** is internal-only, carries no `path_prefix`, no `config` ports, and
-  no `verifications`. Its `user_kind` holds its `state_kind`.
-- **io** is internal-only, carries no `user_kind`, no `path_prefix`, no `config`
+- **state** is internal-only, carries no `path_prefix`, no `language`, no
+  `config` ports, and no `verifications`. Its `user_kind` holds its `state_kind`.
+- **io** is internal-only, carries no `user_kind`, no `path_prefix`, no
+  `language`, no `config`
   ports, and no `verifications`. It must carry **exactly one typed port on one
   side** — an output makes it a *source*, an input makes it a *sink*; it can
   never carry both (it is a source XOR a sink). Fan-out to many behaviors is
