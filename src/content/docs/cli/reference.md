@@ -213,7 +213,7 @@ Show the staged operations in detail. Nothing here has hit the server yet.
 
 Commit the staged changeset to the bound branch as one typed delta batch, under
 optimistic concurrency control. The server validates the whole batch. If any
-operation is invalid (a type mismatch, an unresolved path, a name collision),
+operation is invalid (an unresolved path or a name collision, for example),
 the commit is rejected and nothing is applied. If the branch has moved under you
 since your last `pull`, the commit fails with a conflict (exit code `4`); `pull`
 and retry.

@@ -212,8 +212,9 @@ Each kind admits a specific set of fields:
 
 ### Edge rules
 
-- An edge runs **output → input**; endpoints must be **type-compatible** (equal
-  type strings). Config ports are never endpoints.
+- An edge runs **output → input**. Port types are advisory hints, so a type
+  difference between the two endpoints is surfaced as a warning, not rejected.
+  Config ports are never endpoints.
 - A **state or io edge** must connect exactly one behavior node and exactly one
   state-or-io node — never state↔state, io↔io, or state↔io. The direction
   carries the read/write semantic: a read is state-output → behavior-input; a
