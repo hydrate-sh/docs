@@ -26,7 +26,7 @@ pages describe precisely, field by field.
   the server drops them silently. Missing *required* keys are rejected.
 - **Empty string means null.** For nullable string fields (`parent_id`,
   `user_kind`, `path_prefix`, `language`, `external_kind`, `protocol`,
-  `documentation_url`, and edge handles), the server coerces `""` to `null` at
+  `documentation_url`, `contract_name`, and edge handles), the server coerces `""` to `null` at
   parse time.
 
 ## The graph document
@@ -118,6 +118,8 @@ A port is one input, output, or config endpoint on a node.
 | `name` | string | `""` | Written `name:type` in tooling. |
 | `type` | string | `""` | Nominal type name. |
 | `description` | string | `""` | |
+| `external` | bool | `false` | Strict boolean. Marks the port as an external interface: a point where a consumer of the package interacts with it, such as a public parameter or a readable property. |
+| `contract_name` | string \| null | `null` | The exact public-facing name of that interface point, preserved so a regenerated package stays call-compatible. |
 
 Port ids must be unique across a node's `inputs`, `outputs`, and `config`
 combined.
