@@ -47,7 +47,7 @@ can only edit the graph; it cannot hydrate or generate code.
 
 ## Node types
 
-A graph is built from four kinds of node. Each has a distinct shape, so the
+A graph is built from five kinds of node. Each has a distinct shape, so the
 structure reads at a glance:
 
 - **Behavior** *(rectangle)* — a unit of logic: a transform, a rule, a
@@ -61,6 +61,10 @@ structure reads at a glance:
   standard output, an exit code, a response). An I/O node carries **exactly one
   typed port on one side** — a **source** (an output port, data flowing *into*
   the program) or a **sink** (an input port, data flowing *out*).
+- **Interface** *(hexagon)* — the program's edge with the callers that depend on
+  it: a piece of the public API surface, such as a function, type, or parameter
+  that outside code links against. Where I/O is the program's edge with its
+  environment, interface is its edge with its consumers.
 
 Any node can also be marked **external** — a system outside your graph that you
 depend on (a payment gateway, a database) — labelled with its kind and an

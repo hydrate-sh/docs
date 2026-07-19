@@ -10,7 +10,7 @@ the invariants the server enforces — see [The h2o spec](/concepts/h2o-spec/).
 
 ## Nodes
 
-A node is a vertex in the graph. There are four kinds:
+A node is a vertex in the graph. There are five kinds:
 
 - **Behavior**: a unit of work. The default kind.
 - **Boundary**: a node that contains other nodes. Boundaries nest, forming a
@@ -22,6 +22,10 @@ A node is a vertex in the graph. There are four kinds:
   response). An I/O node carries exactly one typed port on one side: an output
   port makes it a source (data flowing into the program), an input port a sink
   (data flowing out).
+- **Interface**: the program's edge with the callers that depend on it — a piece
+  of the public API surface, such as a function, type, or parameter that outside
+  code links against. Where I/O is the program's edge with its environment,
+  interface is its edge with its consumers.
 
 A behavior or boundary may be marked external, representing a system outside the
 graph. External nodes carry an external-kind label (for example, `rest-api`) and
@@ -36,6 +40,7 @@ Every node has a free-text **description**. It may also carry:
 
 - **Constraints**: a list of free-text strings.
 - **Verifications**: a list of free-text strings.
+- **Aliases**: alternate public names the node is also known by.
 - **Doc URL**: an optional documentation link.
 
 Boundary nodes additionally have a user-kind label, a path prefix, and an
