@@ -51,7 +51,7 @@ A node is a vertex in the graph.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | UUID | Required. |
-| `kind` | enum | Required. One of `behavior`, `boundary`, `state`, `io`. |
+| `kind` | enum | Required. One of `behavior`, `boundary`, `state`, `io`, `interface`. |
 | `parent_id` | UUID \| null | The enclosing boundary, or `null` for a top-level node. |
 | `data` | NodeData | The payload; see below. Defaults to an empty payload. |
 
@@ -59,7 +59,7 @@ A node is a vertex in the graph.
 [`flatten_boundary`](#the-seven-deltas), which removes a boundary. A client may
 echo `kind` inside `data`, but it must match the node's real kind.
 
-### The four kinds
+### The five kinds
 
 - **behavior** — a unit of work (a transform, a rule, a calculation). The
   default kind.
@@ -70,6 +70,10 @@ echo `kind` inside `data`, but it must match the node's real kind.
 - **io** — the program's edge with its environment: where data enters or leaves
   (standard input, arguments, the caller; standard output, an exit code, a
   response). An io node is **one-directional** — see the [io rules](#node-kind-field-matrix).
+- **interface** — the program's edge with the callers that depend on it: a piece
+  of the public API surface — the functions, types, and parameters outside code
+  links against. Where **io** is the program's edge with its *environment*,
+  interface is its edge with its *consumers*.
 
 ## NodeData
 
@@ -81,6 +85,7 @@ server-side.
 | Field | Type | Default | Notes |
 |---|---|---|---|
 | `name` | string | `""` | Unique within the parent scope. |
+| `aliases` | string[] | `[]` | Alternate public names the node is also known by (e.g. other names a symbol is exported under). |
 | `description` | string | `""` | Plain-language spec; the prompt code is generated from. |
 | `inputs` | Port[] | `[]` | Ports the node consumes. |
 | `outputs` | Port[] | `[]` | Ports the node produces. |
@@ -186,14 +191,14 @@ graph well-formed — and what a code-generation step can rely on.
 
 Each kind admits a specific set of fields:
 
-| | behavior | boundary | state | io |
-|---|:---:|:---:|:---:|:---:|
-| `user_kind` | ✗ | ✓ | ✓ *(state_kind)* | ✗ |
-| `path_prefix` | ✗ | ✓ | ✗ | ✗ |
-| `language` | ✗ | ✓ | ✗ | ✗ |
-| `config` ports | ✓ | ✓ | ✗ | ✗ |
-| `verifications` | ✓ | — | ✗ | ✗ |
-| may be `external` | ✓ | ✓ | ✗ | ✗ |
+| | behavior | boundary | state | io | interface |
+|---|:---:|:---:|:---:|:---:|:---:|
+| `user_kind` | ✗ | ✓ | ✓ *(state_kind)* | ✗ | ✗ |
+| `path_prefix` | ✗ | ✓ | ✗ | ✗ | ✗ |
+| `language` | ✗ | ✓ | ✗ | ✗ | ✗ |
+| `config` ports | ✓ | ✓ | ✗ | ✗ | ✓ |
+| `verifications` | ✓ | — | ✗ | ✗ | ✓ |
+| may be `external` | ✓ | ✓ | ✗ | ✗ | ✗ |
 
 - **state** is internal-only, carries no `path_prefix`, no `language`, no
   `config` ports, and no `verifications`. Its `user_kind` holds its `state_kind`.
@@ -203,6 +208,9 @@ Each kind admits a specific set of fields:
   side** — an output makes it a *source*, an input makes it a *sink*; it can
   never carry both (it is a source XOR a sink). Fan-out to many behaviors is
   expressed with *edges* on that one port, not with extra ports.
+- **interface** is internal-only and carries no `user_kind`, no `path_prefix`,
+  and no `language`; its public identity is its `name` (and any `aliases`). It
+  otherwise takes the same fields as a behavior node.
 
 ### External nodes
 
