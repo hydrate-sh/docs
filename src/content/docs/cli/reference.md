@@ -4,8 +4,8 @@ description: Every hydrate CLI verb and its flags.
 ---
 
 The complete command surface. Commands fall into five groups: orientation,
-branch context, authoring, reading, and commit. Authoring commands *stage*
-changes locally; nothing reaches the server until `hydrate commit`.
+project and branch context, authoring, reading, and commit. Authoring commands
+*stage* changes locally; nothing reaches the server until `hydrate commit`.
 
 Every command is available under both the `hydrate` and `hyd` names. Run
 `hydrate <command> --help` for the terse inline reference, or `hydrate guide`
@@ -23,11 +23,20 @@ By default the CLI prints human-readable output on a terminal and JSON when its
 output is piped. The two carry the same information. `--json` and `--human`
 override the auto-detection and cannot be combined.
 
-`--project` applies to the project-scoped verbs (`projects`, `fork`,
-`branches`, `show`) and overrides both the `HYD_PROJECT` environment variable
-and this directory's binding. The binding-only verbs (`pull`, `status`,
-`validate`, `commit`, and the authoring verbs) act on the bound branch and
-ignore it. Run `hydrate projects` for names and ids.
+`--project` applies to `projects`, `fork`, `branches`, and `show`, and overrides
+both the `HYD_PROJECT` environment variable and this directory's binding.
+
+**Every other verb ignores `--project` without saying so.** `walk`, `pull`,
+`status`, `diff`, `validate`, `commit`, and the authoring verbs act on the
+branch this directory is bound to. Passing `--project` to them — even naming a
+project that does not exist — is accepted silently and changes nothing:
+
+```sh
+hydrate status --project no-such-project   # succeeds, reports the bound branch
+```
+
+`hydrate status` is the reliable way to confirm what you are about to write to.
+Run `hydrate projects` for names and ids.
 
 ## Exit codes
 
@@ -36,15 +45,13 @@ ignore it. Run `hydrate projects` for names and ids.
 | `0` | Success. |
 | `1` | Generic failure. |
 | `4` | Conflict (the branch moved under you; `pull` and retry). |
-| `5` | `hydrate validate` found error-severity findings. |
+| `5` | `hydrate validate` returned a `valid: false` verdict. |
 | `6` | Network failure. |
 
 Richer machine-readable detail rides in `--json` output, while the exit codes
-stay stable.
-
-Code `5` is a pass/fail outcome rather than a failure: `validate` reached the
-server and got an answer, and the answer was "there are errors." That is what
-makes `hydrate validate && hydrate commit` a usable gate in a shell.
+stay stable. Code `5` is a pass/fail outcome rather than a failure — `validate`
+reached the server and the answer was "not coherent" — which is what makes it
+usable as a shell gate.
 
 ## Orientation
 
@@ -61,13 +68,12 @@ discovers the workflow — the block points at `hydrate guide`. Idempotent, and 
 never clobbers your other content. A pure local file write: no network, no
 branch, nothing staged.
 
-## Branch context
+## Project and branch context
 
 ### `hydrate projects`
 
-List the projects on your account. Archived projects are flagged.
-
-
+List the projects on your account, with the id, language, intent, and when each
+was last opened. Archived projects are flagged.
 
 ### `hydrate fork <name>`
 
@@ -92,11 +98,11 @@ apply with `commit`.
 
 ### `hydrate node add`
 
-Stage a new node, either a behavior or a boundary.
+Stage a new node.
 
 | Flag | Value | Notes |
 | --- | --- | --- |
-| `--kind` | `behavior` \| `boundary` | Required. |
+| `--kind` | `behavior` \| `boundary` \| `state` \| `io` \| `interface` | Required. |
 | `--name` | name | Required. Unique within its parent scope. |
 | `--description` | text | Free-text description of the node. |
 | `--constraint` | text | A free-text constraint string. Repeatable. |
@@ -108,8 +114,9 @@ Stage a new node, either a behavior or a boundary.
 | `--external` | — | Mark the node external (a system outside the graph). |
 | `--external-kind` | label | The external system's kind (requires `--external`). |
 | `--protocol` | label | External-only: the system's protocol (e.g. `gRPC`). |
-| `--user-kind` | label | Boundary-only: the user-facing kind label. |
+| `--user-kind` | label | On a boundary, classifies the boundary; on a state node, carries the state kind (e.g. `postgres-db`). Behavior nodes do not carry it. |
 | `--path-prefix` | path | Boundary-only: the path prefix the boundary owns. |
+| `--language` | label | Boundary-only: the codegen language (e.g. `go`, `python`). |
 | `--doc-url` | url | A documentation URL (http/https). |
 | `--test-node` | — | Mark the node a test node. |
 
@@ -152,6 +159,8 @@ port's identity:
 | `--clear-user-kind` | — | Clear it. |
 | `--path-prefix` | path | Set the boundary path prefix. |
 | `--clear-path-prefix` | — | Clear it. |
+| `--language` | label | Set the boundary codegen language. |
+| `--clear-language` | — | Clear it. |
 
 **External fields:**
 
@@ -198,8 +207,9 @@ hydrate node rm Api.Rater Api.Encoder
 
 ### `hydrate edge add`
 
-Stage an edge between two typed ports. The edge runs from an output port to an
-input port of the **same type**.
+Stage an edge between two typed ports, from an output port to an input port.
+The two types should match; a mismatch is accepted and reported as a
+`type_mismatch` finding by `hydrate validate` rather than rejected.
 
 | Flag | Value | Notes |
 | --- | --- | --- |
@@ -236,6 +246,20 @@ in place. The cascade removes each node's subtree. Requires a prior
 *committed* graph on the branch. None of them mutate anything: they create no
 branch and stage nothing.
 
+`show --depth` and `walk` are **scoped reads**: the server sends only the slice,
+so a large graph never crosses the wire or enters an agent's context. Turning
+your dotted path into the id such a read is addressed by takes a pulled working
+copy, so the CLI falls back to fetching the whole branch and narrowing it here
+when it cannot. It falls back if there is no working copy, if the index has not
+been pulled, if the path is not in the index, or if you asked for a branch other
+than the bound one.
+
+**A fallback is not equivalent.** It prints a note on **stderr** saying what
+happened, and — for `show` — it drops `--depth` entirely, returning the whole
+subtree. Asking for one level of a 96-node graph without an index gets you all
+96 nodes. On stdout the tell is structural: a scoped `show` carries `scoped`,
+`root`, `depth`, and `truncated` keys that a fallback does not.
+
 ### `hydrate status`
 
 Show the bound branch and a summary of the staged operations.
@@ -253,7 +277,7 @@ whole graph.
 | Flag | Value | Notes |
 | --- | --- | --- |
 | `--branch` | name | Which branch to show. Defaults to this directory's bound branch, else the project's main branch. |
-| `--depth` | `N` | Read only this many levels below `path`. `1` is direct children. Requires `path`. |
+| `--depth` | `1`–`32` | Read only this many levels below `path`. `1` is direct children. Requires `path`; a value outside `1..=32` is rejected. |
 
 ```sh
 hydrate show                    # the whole graph
@@ -261,21 +285,30 @@ hydrate show Api                # Api and everything under it
 hydrate show Api --depth 1      # Api and its direct children only
 ```
 
-`--depth` is not just a filter. Without it the CLI fetches the whole branch and
-narrows the result locally; with it, the server sends only that slice, so a
-large graph never crosses the wire and never enters an agent's context.
+Only `--depth` makes this a scoped read. A bare `show <path>` always fetches the
+whole branch and narrows it here.
 
-That scoped read needs a working copy that has been pulled — the local index is
-what turns your dotted path into the id the server's read is addressed by. If
-there is no index, or the path is not in it, the CLI falls back to fetching the
-whole graph and filtering locally, **and says so**. The output is the same
-either way; only the transfer differs.
+A depth-limited read is a partial answer, and says so when it is:
+
+```
+(cut at depth 1 — there are more nodes below; raise --depth to see them)
+```
+
+JSON sets `"truncated": true` in the same case.
 
 **A subtree view shows only the edges interior to it.** An edge from a node in
-the slice to a node outside it is not in the output — so `show Api.Encoder`
-prints that node with no edges at all, even when several connect to it. `show`
-answers *what is inside this*; use `walk` to ask *what does this touch*. The
-scoped and fallback paths agree on this, so the answer does not change with the
+the slice to a node outside it is not in the output, so `show Api.Encoder` can
+print a node with no edges at all while several connect to it. The CLI counts
+what it left out rather than hiding it:
+
+```
+1 edge cross out of this subtree — run `hydrate show` for the full graph
+```
+
+JSON carries the same count as `cross_boundary_edges`; a `0` there means the
+slice is genuinely self-contained. `show` answers *what is inside this*; use
+`walk` to ask *what does this touch*. Scoped and fallback reads agree on which
+nodes and edges come back, so this part of the answer does not change with the
 state of your index.
 
 ### `hydrate walk <path>`
@@ -288,59 +321,93 @@ node is rendered in full.
 | --- | --- |
 | `--boundary` | Read the boundary's scope instead: its children and the edges interior to it. |
 
+`walk` reads the branch this directory is bound to and requires a binding. There
+is no `--branch`; use `show --branch` to read another one.
+
 ```sh
 hydrate walk Api.Encoder             # the node and everything it touches
 hydrate walk Api --boundary          # what lives inside Api
 ```
 
-`--boundary` only applies to a boundary node. Pointed at anything else, the CLI
-says so up front rather than issuing a read that cannot succeed:
+Running plain `walk` on a boundary is fine — it returns the neighborhood and
+points out that `--boundary` will show the interior.
+
+`--boundary` applies only to a boundary node. Pointed at anything else, the CLI
+refuses before issuing a read that cannot succeed, and exits `1`:
 
 ```
-'Api.Encoder' is not a boundary — this working copy's index has it as a
-behavior. Run `hydrate walk Api.Encoder` for its neighborhood, or
+hydrate: 'Api.Encoder' is not a boundary — this working copy's index has it as
+a behavior. Run `hydrate walk Api.Encoder` for its neighborhood, or
 `hydrate pull` if the index is behind.
 ```
 
-That verdict comes from your local index, which is why the message says so: a
-node's kind can change on the branch. If the index is older than the branch, or
-predates a kind this build knows, the CLI defers to the server rather than
-guessing.
-
-Like `show --depth`, `walk` is a genuinely scoped read when a pulled index is
-present, and falls back to a whole-graph fetch with a note when one is not.
+The kind comes from your local index, which is why the message says so — a
+node's kind can change on the branch. Without an index the CLI cannot mention
+one, so the wording is shorter and omits the `pull` advice. When the index
+records no kind for that node, the check is skipped and the read is sent, with a
+note explaining why.
 
 ## Validate and commit
 
 ### `hydrate validate`
 
 Dry-run the staged changeset against the bound branch and report the server's
-coherence findings — without committing, and without clearing the stage. Run it
-as many times as you like.
+coherence findings, without committing and without clearing the stage. Run it as
+often as you like.
 
-Exits `5` when there are error-severity findings, so an agent can gate the
-commit in a shell:
+**The verdict is on the resulting branch as a whole, not on your changeset.**
+Findings that were already on the branch are reported alongside anything your
+staged edits introduce, and an empty stage is a valid input — it asks "is this
+branch coherent right now?". That makes `validate` a branch-health probe, but it
+also means the verdict is not a judgement on your work alone.
 
 ```sh
 hydrate validate && hydrate commit
 ```
 
-Human output resolves each finding to a dotted path:
+This gate is only usable on a branch that is already clean. On a branch carrying
+pre-existing findings — the normal state of a large imported graph — it will
+refuse to commit no matter how correct your change is. Run `validate` **before**
+staging to get a baseline, then compare.
+
+Human output resolves each finding to a dotted path and ends with the verdict:
 
 ```
-99 coherence findings:
+2 coherence findings:
   [error] unsatisfied_input  Api.Encoder.url: input port Api.Encoder.url has no incoming edge
+  [error] type_mismatch  Api.Shorten.url -> Api.Encoder.url: edge connects a port of type 'LongUrl' to one of type 'ShortCode'
+
+Invalid: 2 coherence errors on branch 'demo'; not safe to commit.
 ```
 
-JSON output carries the raw `locator` — the port or node id — beside the `code`,
-`severity`, and `message`. The path resolution is the CLI's, from your pulled
-index, so a stale working copy can yield a stale path; the CLI compares branch
-versions and warns when it detects one.
+A clean branch reports `Valid: no coherence errors on branch 'demo'.`, or
+`No coherence findings.` when there are none at all.
 
-Structural coherence
-(a dangling edge, a missing input, a cycle, a kind that cannot hold what it
-holds) is a **hard gate**. Type compatibility across an edge is **advisory** —
-a mismatch is reported as a hint, not an error, and will not block a commit.
+`validate` reports exactly three codes — `unsatisfied_input`, `dangling_wire`,
+and `type_mismatch` — and the server currently emits **all three at `error`
+severity**, so any of them fails the gate above. Note in particular that a type
+mismatch does *not* block `hydrate commit` on its own: the commit endpoint
+accepts mismatched edges, because port types are advisory hints rather than a
+hard contract. `validate` is the stricter of the two. If you need to commit a
+graph whose only findings are type mismatches, run `hydrate commit` directly
+rather than through the `&&` gate.
+
+Exit code `5` follows the server's `valid` verdict, not the CLI's own count of
+findings; when the two disagree the CLI trusts the server and says so loudly.
+
+JSON output carries the server's `findings` verbatim — each with `code`,
+`severity`, `message`, and a raw `locator` id — plus a `valid` boolean and a
+`located` array that adds the resolved dotted `path` for each finding. Prefer
+`located`: `path_complete` is `false` when only part of a path could be
+resolved, which lets a consumer tell a complete answer from a partial one
+without inspecting ids.
+
+Path resolution is the CLI's, from your pulled index, so a stale working copy
+can yield a stale path. The CLI compares the branch version it pulled at against
+the branch's current version and warns when they differ — even when every id
+resolved, because a confidently wrong path is worse than a raw id. It also warns
+when the index is unreadable or when some ids cannot be placed at all; in those
+cases findings are shown by id.
 
 ### `hydrate commit`
 

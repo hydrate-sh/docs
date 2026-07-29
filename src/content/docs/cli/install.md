@@ -13,26 +13,35 @@ toolchain. Each release publishes archives for Linux (x86_64, aarch64), macOS
 (x86_64, aarch64), and Windows (x86_64), each with a `.sha256` checksum.
 
 Download the archive for your platform from the
-[Releases](https://github.com/hydrate-sh/cli/releases) page, verify it against
-its published checksum, and put `hydrate` on your `PATH`. The snippet below
-pins a version; check the Releases page for the current one.
+[Releases](https://github.com/hydrate-sh/cli/releases) page, verify it, and put
+`hydrate` on your `PATH`:
 
 ```sh
-# Linux x86_64. Adjust the version and target for your platform.
+# Linux x86_64. Check Releases for the current tag; adjust the target for your platform.
 tag=v0.1.16
 target=x86_64-unknown-linux-gnu
 curl -fsSLO "https://github.com/hydrate-sh/cli/releases/download/${tag}/hydrate-${tag}-${target}.tar.gz"
 curl -fsSLO "https://github.com/hydrate-sh/cli/releases/download/${tag}/hydrate-${tag}-${target}.tar.gz.sha256"
+
+# Integrity: did the download arrive intact?
 sha256sum -c "hydrate-${tag}-${target}.tar.gz.sha256"
+
+# Provenance: was it really built from this repo? Verify BEFORE you run it.
+gh attestation verify "hydrate-${tag}-${target}.tar.gz" --repo hydrate-sh/cli
+
 tar xzf "hydrate-${tag}-${target}.tar.gz"
 ./hydrate --version
 ```
 
-The archives also carry signed build provenance. Verify it with the GitHub CLI:
+The two checks do different jobs, and only the second is adversarial. The
+archive and its checksum come from the same host over the same channel, so
+anyone able to serve you a bad archive could serve a matching checksum —
+`sha256sum` catches a truncated or corrupted download, not a substituted one.
+The attestation is a signed statement that the artifact was built by this
+repository's release workflow, which is why it belongs before `tar`.
 
-```sh
-gh attestation verify hydrate-${tag}-${target}.tar.gz --repo hydrate-sh/cli
-```
+`gh attestation` needs GitHub CLI 2.49 or newer. On Windows the asset is a
+`.zip` rather than a `.tar.gz`.
 
 ## Authenticate
 
