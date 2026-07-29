@@ -36,6 +36,10 @@ export HYD_API_KEY=hyd_live_xxxxxxxxxxxxxxxxxxxx
 hydrate branches
 ```
 
+If you use a `.env` file, add it to your `.gitignore` first — a working copy is
+usually a repository, and a live key committed there is a key you have to
+revoke.
+
 The CLI does not write the key to disk, and it does not print or log it,
 including in `--json` output and at debug level.
 
