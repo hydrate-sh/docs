@@ -372,7 +372,8 @@ pre-existing findings — the normal state of a large imported graph — it will
 refuse to commit no matter how correct your change is. Run `validate` **before**
 staging to get a baseline, then compare.
 
-Human output resolves each finding to a dotted path and ends with the verdict:
+Human output — what you get on a terminal; piped, this is JSON — resolves each
+finding to a dotted path and ends with the verdict:
 
 ```
 2 coherence findings:
@@ -389,20 +390,22 @@ A clean branch reports `Valid: no coherence errors on branch 'demo'.`, or
 and `type_mismatch` — and the server emits **all three at `error` severity**, so
 any of them fails the gate above.
 
-**None of them blocks a commit.** Coherence is reported, not enforced: a commit
-whose result carries error-severity findings is accepted, and `hydrate commit`
-returns `0`. That is deliberate — a node legitimately exists before the edge
-that will feed it, and you must be able to commit a half-wired graph while you
-are still designing it.
+**`unsatisfied_input` and `type_mismatch` do not block a commit.** Coherence is
+reported, not enforced: a commit whose result carries those findings is
+accepted, and `hydrate commit` returns `0`. That is deliberate — a node
+legitimately exists before the edge that will feed it, and you must be able to
+commit a half-wired graph while you are still designing it. If you want to
+commit a graph `validate` refuses, run `hydrate commit` directly rather than
+through the `&&` gate.
 
-So `validate` is stricter than the endpoint it gates, by choice. It is the check
-you opt into, not a barrier the server imposes. If you want to commit a graph
-that `validate` refuses, run `hydrate commit` directly rather than through the
-`&&` gate.
+**`dangling_wire` is the exception.** An edge handle pointing at a port that
+does not exist cannot be stored at all, so that one fails the commit. `validate`
+can report it only because it builds the resulting graph in memory rather than
+applying it.
 
-What the commit endpoint *does* refuse is a different layer: a delta that cannot
-be applied at all — an unresolved path, a name collision, an edge that breaks
-the state/io connection rules. Those fail the commit outright.
+What the commit endpoint refuses is that same layer: a delta that cannot be
+applied — an unresolved path, a name collision, a dangling handle, an edge that
+breaks the state/io connection rules.
 
 Exit code `5` follows the server's `valid` verdict, not the CLI's own count of
 findings; when the two disagree the CLI trusts the server and says so loudly.
@@ -430,6 +433,6 @@ the commit is rejected and nothing is applied. If the branch has moved under you
 since your last `pull`, the commit fails with a conflict (exit code `4`); `pull`
 and retry.
 
-A commit is **not** refused for coherence findings — see
-[`hydrate validate`](#hydrate-validate). Unwired inputs, dangling edges, and
-type mismatches are all reported and all committable.
+Unwired inputs and mismatched port types are reported but do not refuse a
+commit — see [`hydrate validate`](#hydrate-validate). An edge handle pointing at
+a port that does not exist is refused, because it cannot be stored.

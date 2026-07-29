@@ -32,9 +32,9 @@ server rejects it at commit time and reports why.
 
 `validate` is a **different, stricter check**. It asks whether the resulting
 graph is *coherent*: no unwired inputs, no dangling edges, no mismatched port
-types. A commit is never refused for any of those, so `validate` is the gate you
-opt into rather than one the server imposes. It never clears the stage, and it
-exits `5` when the branch is not coherent:
+types. Most of that a commit will accept, so `validate` is the gate you opt into
+rather than one the server imposes. It never clears the stage, and it exits `5`
+when the branch is not coherent:
 
 ```sh
 hydrate validate && hydrate commit
