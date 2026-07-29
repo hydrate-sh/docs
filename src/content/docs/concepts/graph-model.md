@@ -67,8 +67,17 @@ endpoints.
 The two ports should have the same type, but the type is a hint rather than a
 contract: the server accepts an edge whose endpoints disagree. It reports the
 mismatch as a `type_mismatch` coherence finding, which `hydrate validate`
-surfaces. Structure — that both endpoints exist, that no input is left unwired —
-is enforced; types are advisory.
+surfaces.
+
+Coherence in general — a type mismatch, a dangling edge, an input left unwired —
+is **reported rather than enforced**. None of it prevents a commit, because a
+graph under construction is legitimately incoherent: you add a node before you
+add the edge that feeds it. `hydrate validate` is the check you run when you
+want the answer.
+
+What the server does refuse is a graph it cannot represent at all: an edge to a
+port that does not exist, a name that collides with a sibling, a cycle in the
+containment tree.
 
 ## Addressing: dotted paths
 
