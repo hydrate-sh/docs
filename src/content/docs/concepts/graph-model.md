@@ -61,9 +61,14 @@ ports are compatible when their type strings are equal.
 
 ## Edges
 
-An edge connects an output port to an input port. Both ports must have the same
-type. The server rejects an edge whose endpoints have different types, and config
-ports cannot be edge endpoints.
+An edge connects an output port to an input port. Config ports cannot be edge
+endpoints.
+
+The two ports should have the same type, but the type is a hint rather than a
+contract: the server accepts an edge whose endpoints disagree. It reports the
+mismatch as a `type_mismatch` coherence finding, which `hydrate validate`
+surfaces. Structure — that both endpoints exist, that no input is left unwired —
+is enforced; types are advisory.
 
 ## Addressing: dotted paths
 

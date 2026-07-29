@@ -145,9 +145,9 @@ An edge connects one node's output port to another node's input port.
 | `source_handle` | UUID \| null | The source **output** port id. |
 | `target_handle` | UUID \| null | The target **input** port id. |
 
-An edge runs **output → input**, and the two ports must have the **same type**.
-Config ports are never edge endpoints. See the [edge rules](#edge-rules) for how
-edges interact with state and io nodes.
+An edge runs **output → input**, and the two ports should have the same type —
+advisory, not enforced; see below. Config ports are never edge endpoints. See
+the [edge rules](#edge-rules) for how edges interact with state and io nodes.
 
 ## The delta mutation grammar
 
