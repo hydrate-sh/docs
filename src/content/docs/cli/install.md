@@ -14,11 +14,12 @@ toolchain. Each release publishes archives for Linux (x86_64, aarch64), macOS
 
 Download the archive for your platform from the
 [Releases](https://github.com/hydrate-sh/cli/releases) page, verify it against
-its published checksum, and put `hydrate` on your `PATH`:
+its published checksum, and put `hydrate` on your `PATH`. The snippet below
+pins a version; check the Releases page for the current one.
 
 ```sh
 # Linux x86_64. Adjust the version and target for your platform.
-tag=v0.1.5
+tag=v0.1.16
 target=x86_64-unknown-linux-gnu
 curl -fsSLO "https://github.com/hydrate-sh/cli/releases/download/${tag}/hydrate-${tag}-${target}.tar.gz"
 curl -fsSLO "https://github.com/hydrate-sh/cli/releases/download/${tag}/hydrate-${tag}-${target}.tar.gz.sha256"
