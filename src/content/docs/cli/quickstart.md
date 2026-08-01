@@ -27,12 +27,14 @@ stages, committed when it is ready.
 
 The CLI stages edits locally and commits them as a single delta batch. The
 server is the sole authority for validation, so the CLI does not mirror its
-rules. If a batch is invalid, the server rejects it at commit time and reports
-why.
+rules. If a batch cannot be applied — an unresolved path, a name collision — the
+server rejects it at commit time and reports why.
 
-`validate` is that same check, on demand and without the commit. It never clears
-the stage, and it exits `5` when the branch is not coherent, which makes it a
-gate:
+`validate` is a **different, stricter check**. It asks whether the resulting
+graph is *coherent*: no unwired inputs, no dangling edges, no mismatched port
+types. Most of that a commit will accept, so `validate` is the gate you opt into
+rather than one the server imposes. It never clears the stage, and it exits `5`
+when the branch is not coherent:
 
 ```sh
 hydrate validate && hydrate commit

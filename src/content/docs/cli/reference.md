@@ -44,6 +44,7 @@ Run `hydrate projects` for names and ids.
 | --- | --- |
 | `0` | Success. |
 | `1` | Generic failure. |
+| `2` | Usage error — a missing argument, an unknown flag, or two flags that cannot be combined. |
 | `4` | Conflict (the branch moved under you; `pull` and retry). |
 | `5` | `hydrate validate` returned a `valid: false` verdict. |
 | `6` | Network failure. |
@@ -51,7 +52,8 @@ Run `hydrate projects` for names and ids.
 Richer machine-readable detail rides in `--json` output, while the exit codes
 stay stable. Code `5` is a pass/fail outcome rather than a failure — `validate`
 reached the server and the answer was "not coherent" — which is what makes it
-usable as a shell gate.
+usable as a shell gate. Code `2` means the command was never run: nothing
+reached the server, so retrying it unchanged cannot succeed.
 
 ## Orientation
 
@@ -370,7 +372,8 @@ pre-existing findings — the normal state of a large imported graph — it will
 refuse to commit no matter how correct your change is. Run `validate` **before**
 staging to get a baseline, then compare.
 
-Human output resolves each finding to a dotted path and ends with the verdict:
+Human output — what you get on a terminal; piped, this is JSON — resolves each
+finding to a dotted path and ends with the verdict:
 
 ```
 2 coherence findings:
@@ -384,13 +387,25 @@ A clean branch reports `Valid: no coherence errors on branch 'demo'.`, or
 `No coherence findings.` when there are none at all.
 
 `validate` reports exactly three codes — `unsatisfied_input`, `dangling_wire`,
-and `type_mismatch` — and the server currently emits **all three at `error`
-severity**, so any of them fails the gate above. Note in particular that a type
-mismatch does *not* block `hydrate commit` on its own: the commit endpoint
-accepts mismatched edges, because port types are advisory hints rather than a
-hard contract. `validate` is the stricter of the two. If you need to commit a
-graph whose only findings are type mismatches, run `hydrate commit` directly
-rather than through the `&&` gate.
+and `type_mismatch` — and the server emits **all three at `error` severity**, so
+any of them fails the gate above.
+
+**`unsatisfied_input` and `type_mismatch` do not block a commit.** Coherence is
+reported, not enforced: a commit whose result carries those findings is
+accepted, and `hydrate commit` returns `0`. That is deliberate — a node
+legitimately exists before the edge that will feed it, and you must be able to
+commit a half-wired graph while you are still designing it. If you want to
+commit a graph `validate` refuses, run `hydrate commit` directly rather than
+through the `&&` gate.
+
+**`dangling_wire` is the exception.** An edge handle pointing at a port that
+does not exist cannot be stored at all, so that one fails the commit. `validate`
+can report it only because it builds the resulting graph in memory rather than
+applying it.
+
+What the commit endpoint refuses is that same layer: a delta that cannot be
+applied — an unresolved path, a name collision, a dangling handle, an edge that
+breaks the state/io connection rules.
 
 Exit code `5` follows the server's `valid` verdict, not the CLI's own count of
 findings; when the two disagree the CLI trusts the server and says so loudly.
@@ -417,3 +432,7 @@ operation is invalid (an unresolved path or a name collision, for example),
 the commit is rejected and nothing is applied. If the branch has moved under you
 since your last `pull`, the commit fails with a conflict (exit code `4`); `pull`
 and retry.
+
+Unwired inputs and mismatched port types are reported but do not refuse a
+commit — see [`hydrate validate`](#hydrate-validate). An edge handle pointing at
+a port that does not exist is refused, because it cannot be stored.
