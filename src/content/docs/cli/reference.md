@@ -450,17 +450,21 @@ What the commit endpoint refuses is that same layer: a delta that cannot be
 applied — an unresolved path, a name collision, a dangling handle, an edge that
 breaks the state/io connection rules.
 
-Exit code `5` follows the server's `valid` verdict, not the CLI's own count of
-findings; when the two disagree the CLI trusts the server and says so loudly.
+Exit code `5` follows the findings your change introduced. With
+`--whole-branch` it follows the server's `valid` verdict verbatim, and when that
+verdict disagrees with the findings shipped alongside it the CLI trusts the
+server and says so loudly.
 
 JSON output carries the three buckets as separate arrays — `introduced`,
 `inherited`, `resolved` — so a consumer cannot accidentally gate on the wrong
 set. `valid` matches the exit code and is therefore about your change;
-`whole_branch_valid` carries the server's verdict on the whole graph. A
-`located` array adds the resolved dotted `path` for each finding. Prefer
-`located`: `path_complete` is `false` when only part of a path could be
-resolved, which lets a consumer tell a complete answer from a partial one
-without inspecting ids.
+`whole_branch_valid` carries the server's verdict on the whole graph.
+
+Each finding in a bucket carries its own resolved dotted `path`, plus
+`path_complete`, which is `false` when only part of the path could be resolved —
+so a consumer can tell a complete answer from a partial one without inspecting
+ids. (`--whole-branch` instead returns the server's `findings` verbatim beside a
+parallel `located` array, since there is one flat list to index into.)
 
 Path resolution is the CLI's, from your pulled index, so a stale working copy
 can yield a stale path. The CLI compares the branch version it pulled at against
