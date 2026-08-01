@@ -34,16 +34,15 @@ server rejects it at commit time and reports why.
 graph is *coherent*: no unwired inputs, no dangling edges, no mismatched port
 types. Most of that a commit will accept, so `validate` is the gate you opt into
 rather than one the server imposes. It never clears the stage, and it exits `5`
-when the branch is not coherent:
+when **your change** adds an error-severity finding:
 
 ```sh
 hydrate validate && hydrate commit
 ```
 
-The verdict covers the whole resulting branch, not just your changeset, so the
-gate is only usable on a branch that is already clean. See the
-[reference](/cli/reference/) for what that means on a branch with pre-existing
-findings.
+Findings that were already on the branch are listed but do not gate, so this
+works on a branch that is not yet clean. Pass `--whole-branch` when the question
+is "is this branch coherent?" rather than "did I break something".
 
 ## A worked example
 
@@ -89,6 +88,7 @@ After a `hydrate pull`, you can edit committed nodes by path:
 hydrate node set Api.Encoder --description 'Mint a collision-free base62 code; 7 chars.'
 hydrate node rm Api.Shorten          # removes the node (cascades its subtree)
 hydrate clear                        # stage removal of every top-level node, to rebuild
+hydrate stage discard                # throw away everything staged, keeping the branch
 ```
 
 Every edit stages the same way. Review with `hydrate diff`, then apply with
