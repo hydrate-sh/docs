@@ -18,7 +18,7 @@ Download the archive for your platform from the
 
 ```sh
 # Linux x86_64. Check Releases for the current tag; adjust the target for your platform.
-tag=v0.1.16
+tag=v0.1.17
 target=x86_64-unknown-linux-gnu
 curl -fsSLO "https://github.com/hydrate-sh/cli/releases/download/${tag}/hydrate-${tag}-${target}.tar.gz"
 curl -fsSLO "https://github.com/hydrate-sh/cli/releases/download/${tag}/hydrate-${tag}-${target}.tar.gz.sha256"
