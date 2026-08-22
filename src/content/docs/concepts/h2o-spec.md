@@ -4,9 +4,8 @@ description: The canonical format for a hydrate project — node, port, edge, an
 ---
 
 **h2o** is the canonical format for a hydrate project. It is the single source
-of truth: the browser editor, the [`hydrate` CLI](/cli/quickstart/), the
-[v1 API](/api/v1/), and every code-generation step all read and write the same
-shapes defined here.
+of truth: the browser editor, the [v1 API](/api/v1/), and every code-generation
+step all read and write the same shapes defined here.
 
 This page is the formal reference. If you want the concepts first, read
 [The graph model](/concepts/graph-model/); if you want a task-oriented tour,
@@ -40,7 +39,7 @@ A project is a graph of **nodes** and **edges**:
 }
 ```
 
-When the graph is exported as a `.h2o` file (what the CLI works with), it is
+When the graph is exported as a `.h2o` file, it is
 wrapped in an envelope carrying a `schema_version`, the project name, and the
 node and edge lists. See [Versioning](#versioning) below.
 
@@ -264,6 +263,6 @@ Two version numbers matter, and they are independent:
 - [The graph model](/concepts/graph-model/) — the same structure, explained
   conceptually.
 - [Quickstart](/getting-started/quickstart/) — a task-oriented tour of the
-  editor and CLI.
+  editor.
 - [API reference](/api/v1/) — the live, generated reference for the HTTP
   surface, including the delta endpoint.

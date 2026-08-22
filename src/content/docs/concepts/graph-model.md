@@ -3,8 +3,8 @@ title: The graph model
 description: Nodes, typed ports, edges, boundaries, and branches.
 ---
 
-A hydrate project is a graph. This page defines its structure, which both the
-[CLI](/cli/quickstart/) and the [v1 API](/api/v1/) operate on. For the formal,
+A hydrate project is a graph. This page defines its structure, which the
+[v1 API](/api/v1/) operates on. For the formal,
 field-by-field reference — the canonical **h2o** format, its delta grammar, and
 the invariants the server enforces — see [The h2o spec](/concepts/h2o-spec/).
 
@@ -66,14 +66,12 @@ endpoints.
 
 The two ports should have the same type, but the type is a hint rather than a
 contract: the server accepts an edge whose endpoints disagree. It reports the
-mismatch as a `type_mismatch` coherence finding, which `hydrate validate`
-surfaces.
+mismatch as a `type_mismatch` coherence finding, which validation surfaces.
 
 A type mismatch and an input left unwired are **reported rather than enforced**:
 neither prevents a commit, because a graph under construction is legitimately
-incoherent. `hydrate validate` is the check you run when you want the answer,
-and the [CLI reference](/cli/reference/#hydrate-validate) covers what it does
-and does not gate.
+incoherent. Validation is the check you run when you want the answer; the
+[API reference](/api/v1/) covers the endpoint and what it does and does not gate.
 
 What the server does refuse is a graph it cannot represent at all: an edge to a
 port that does not exist, a name that collides with a sibling, a cycle in the
@@ -93,13 +91,10 @@ A node's name is unique within its parent scope.
 ## Branches
 
 A project has a `main` branch and any number of working branches. You create a
-working branch with `hydrate fork` and make edits on it; `main` is not edited
-directly. The graph is stored on the server, and the CLI keeps a local view that
-`hydrate pull` refreshes.
+working branch and make edits on it; `main` is not edited directly. The graph is
+stored on the server.
 
 ## See also
 
 - [The h2o spec](/concepts/h2o-spec/): the formal format reference.
-- [CLI quickstart](/cli/quickstart/): the commands that build a graph.
-- [CLI command reference](/cli/reference/): every verb and flag.
-- [API reference](/api/v1/): the same operations over HTTP.
+- [API reference](/api/v1/): the operations over HTTP.

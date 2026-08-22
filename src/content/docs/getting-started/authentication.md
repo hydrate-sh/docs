@@ -1,10 +1,9 @@
 ---
 title: Authentication
-description: How to authenticate the hydrate.sh CLI and the v1 API.
+description: How to authenticate to the hydrate.sh v1 API.
 ---
 
-Both the [`hydrate` CLI](/cli/quickstart/) and the [v1 API](/api/v1/)
-authenticate with the same kind of API key. One key works for both surfaces.
+The [v1 API](/api/v1/) authenticates with an API key.
 
 ## Getting a key
 
@@ -25,26 +24,6 @@ curl https://api.hydrate.sh/v1/projects \
 ```
 
 A request with a missing or invalid key returns `401`.
-
-## The CLI
-
-The CLI reads your key from the **`HYD_API_KEY`** environment variable, or from
-a `.env` file in the working directory:
-
-```bash
-export HYD_API_KEY=hyd_live_xxxxxxxxxxxxxxxxxxxx
-hydrate branches
-```
-
-If you use a `.env` file, add it to your `.gitignore` first — a working copy is
-usually a repository, and a live key committed there is a key you have to
-revoke.
-
-The CLI does not write the key to disk, and it does not print or log it,
-including in `--json` output and at debug level.
-
-To point the CLI at a different service URL for local development, set
-`HYD_BASE_URL`.
 
 ## Scope and revocation
 

@@ -14,8 +14,7 @@ need to be productive.
 
 Alpha is focused on **authoring and validating a system graph**:
 
-- Build the graph — in the browser editor, or from the terminal with the
-  [CLI](/cli/quickstart/).
+- Build the graph in the browser editor.
 - Describe each node in plain language; a node's description is the instruction
   its code is generated from.
 - Connect nodes through **typed ports** and **validate** that the pieces fit
@@ -37,7 +36,8 @@ You use up to two independent keys, depending on what you're doing:
 | To… | You need | Where it goes |
 |---|---|---|
 | Use the **Chat agent** in the browser | your **Anthropic** key | Settings → Account |
-| Use the **CLI** and hydrate **locally** | a **Hydrate** key **and** your **Anthropic** key | `HYD_API_KEY` for the CLI; your Anthropic key for local generation |
+| Use the **v1 API** | a **Hydrate** key | `Authorization: Bearer` header |
+| Generate code **locally** from your graph | your **Anthropic** key | your own LLM tooling |
 
 Your **Hydrate** key (`hyd_live_…`) authenticates you to your hydrate.sh
 account — see [Authentication](/getting-started/authentication/). Your
@@ -111,15 +111,15 @@ In the browser editor you can:
   nodes for you.
 
 Your work lives on a **branch** and autosaves. You fork a working branch and
-build on it; `main` is not edited directly. The same graph is reachable from the
-[CLI](/cli/quickstart/) and the [API](/api/v1/).
+build on it; `main` is not edited directly. The same graph is reachable over the
+[API](/api/v1/).
 
 ## Getting code out
 
 App-side hydration is coming. Today the path is local:
 
-1. Author and validate your graph (browser or CLI).
-2. Pull it with the CLI (`hydrate pull`), or read it via the [API](/api/v1/).
+1. Author and validate your graph in the browser editor.
+2. Read it via the [API](/api/v1/).
 3. Each node's **description is the generation prompt**. Generate code from the
    graph with **your own LLM** (your Anthropic key) — node by node, or a
    boundary at a time.
@@ -131,6 +131,5 @@ codebase back into the graph — are on the roadmap.
 
 - [The graph model](/concepts/graph-model/) — the precise structure of nodes,
   ports, edges, and branches.
-- [CLI quickstart](/cli/quickstart/) — build a graph from the terminal.
 - [Authentication](/getting-started/authentication/) — get your Hydrate key.
 - [API reference](/api/v1/) — the same graph over HTTP.
